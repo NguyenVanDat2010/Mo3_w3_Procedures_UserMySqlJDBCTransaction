@@ -38,7 +38,7 @@ public class UserServlet extends HttpServlet {
 //                    searchUserById(request,response);
                     break;
                 case "sort":
-                    sortUser(request,response);
+                    sortUser(request, response);
                     break;
                 default:
                     break;
@@ -49,27 +49,35 @@ public class UserServlet extends HttpServlet {
     }
 
     private void sortUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String sortBy= request.getParameter("sortBy");
-        String styleSort  = request.getParameter("styleSort");
+        String sortBy = request.getParameter("sortBy");
+        String styleSort = request.getParameter("styleSort");
 
-        List<User> userList = this.userService.sortUsers(sortBy,styleSort);
+        List<User> userList = this.userService.sortUsers(sortBy, styleSort);
 
-        request.setAttribute("users",userList);
-        RequestDispatcher  dispatcher= request.getRequestDispatcher("user/list.jsp");
+        request.setAttribute("users", userList);
+        RequestDispatcher dispatcher = request.getRequestDispatcher("user/list.jsp");
         dispatcher.forward(request, response);
     }
 
     private void searchUser(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         String value = request.getParameter("searchValue");
-//        int id = Integer.parseInt(request.getParameter("searchValue"));
+        List<User> userList = null;
+        User user = null;
 
-        List<User> userList = this.userService.searchUsers(value);
-
-        RequestDispatcher dispatcher ;
-        if (userList==null){
-            dispatcher= request.getRequestDispatcher("error-404.jsp");
+        boolean isString = value instanceof String;
+        if (isString){
+            userList = this.userService.searchUsers(value);
         }else {
-            request.setAttribute("users",userList);
+            int id = Integer.parseInt(request.getParameter("searchValue"));
+            user = this.userService.selectUserById(id);
+            userList.add(user);
+        }
+
+        RequestDispatcher dispatcher;
+        if (userList == null) {
+            dispatcher = request.getRequestDispatcher("error-404.jsp");
+        } else {
+            request.setAttribute("users", userList);
             dispatcher = request.getRequestDispatcher("user/list.jsp");
         }
         dispatcher.forward(request, response);
@@ -96,7 +104,7 @@ public class UserServlet extends HttpServlet {
         String country = request.getParameter("country");
         int id = Integer.parseInt(request.getParameter("id"));
 
-        User user = new User(id,name,email,country);
+        User user = new User(id, name, email, country);
         this.userService.updateUser(user);
 
         request.getRequestDispatcher("user/createAndEdit.jsp");
@@ -108,11 +116,11 @@ public class UserServlet extends HttpServlet {
         String email = request.getParameter("email");
         String country = request.getParameter("country");
 
-        User user = new User(name,email,country);
+        User user = new User(name, email, country);
         this.userService.insertUser(user);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("user/createAndEdit.jsp");
-        request.setAttribute("message","New user was create");
+        request.setAttribute("message", "New user was create");
 
         dispatcher.forward(request, response);
     }
@@ -120,28 +128,28 @@ public class UserServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
 
-        if (action == null){
+        if (action == null) {
             action = "";
         }
         try {
-            switch (action){
+            switch (action) {
                 case "create":
-                    showInsertUser(request,response);
+                    showInsertUser(request, response);
                     break;
                 case "edit":
-                    showUpdateUser(request,response);
+                    showUpdateUser(request, response);
                     break;
                 case "delete":
-                    deleteUser(request,response);
+                    deleteUser(request, response);
                     break;
 //                case "search":
 //                    searchUserById(request,response);
 //                    break;
                 default:
-                    showAllUsers(request,response);
+                    showAllUsers(request, response);
                     break;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -150,8 +158,8 @@ public class UserServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         this.userService.deleteUser(id);
 
-        List<User> userList =this.userService.SelectAllUsers();
-        request.setAttribute("users",userList);
+        List<User> userList = this.userService.SelectAllUsers();
+        request.setAttribute("users", userList);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("user/list.jsp");
         dispatcher.forward(request, response);
@@ -161,7 +169,7 @@ public class UserServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("id"));
         User user = this.userService.selectUserById(id);
 
-        request.setAttribute("user",user);
+        request.setAttribute("user", user);
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("user/createAndEdit.jsp");
         dispatcher.forward(request, response);
@@ -175,7 +183,7 @@ public class UserServlet extends HttpServlet {
     private void showAllUsers(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         List<User> userList = this.userService.SelectAllUsers();
 
-        request.setAttribute("users",userList);
+        request.setAttribute("users", userList);
         RequestDispatcher dispatcher = request.getRequestDispatcher("user/list.jsp");
         dispatcher.forward(request, response);
     }

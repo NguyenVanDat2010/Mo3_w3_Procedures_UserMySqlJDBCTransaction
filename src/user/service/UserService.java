@@ -68,7 +68,7 @@ public class UserService implements IUserService {
                 PreparedStatement prstmt = connection.prepareStatement(SELECT_USERS_BY_ID);
         ) {
             System.out.println(prstmt);
-            prstmt.setInt(1,id);
+            prstmt.setInt(1, id);
             ResultSet rs = prstmt.executeQuery();
 
             if (rs.next()) {
@@ -131,11 +131,11 @@ public class UserService implements IUserService {
         try (
                 Connection connection = getConnection();
                 PreparedStatement prstmt = connection.prepareStatement(DELETE_USERS_VALUES);
-        ){
+        ) {
             System.out.println(prstmt);
-            prstmt.setInt(1,id);
-            rowDeleted = prstmt.executeUpdate()>0;
-            System.out.println("Successfully deleted? "+rowDeleted);
+            prstmt.setInt(1, id);
+            rowDeleted = prstmt.executeUpdate() > 0;
+            System.out.println("Successfully deleted? " + rowDeleted);
         } catch (SQLException throwables) {
             printSQLException(throwables);
         }
@@ -146,24 +146,24 @@ public class UserService implements IUserService {
     public List<User> searchUsers(String value) throws SQLException {
         List<User> userList = new ArrayList<>();
 
-        value = checkSpaceValue(value);
+        value = clearSpaceValue(value);
         try (
                 Connection connection = getConnection();
                 PreparedStatement prstmt = connection.prepareStatement(SEARCH_USERS_VALUES);
-        ){
+        ) {
             System.out.println(prstmt);
 //            prstmt.setInt(1,id);
-            prstmt.setString(1,value);
-            prstmt.setString(2,value);
-            prstmt.setString(3,value);
+            prstmt.setString(1, value);
+            prstmt.setString(2, value);
+            prstmt.setString(3, value);
 
             ResultSet rs = prstmt.executeQuery();
 //            System.out.println("Gia tri cua rs "+rs);
-            while (rs.next()){
+            while (rs.next()) {
                 String name = rs.getString("name");
                 String email = rs.getString("email");
                 String country = rs.getString("country");
-                userList.add(new User(name,email,country));
+                userList.add(new User(name, email, country));
             }
         }
         return userList;
@@ -172,14 +172,14 @@ public class UserService implements IUserService {
     @Override
     public List<User> sortUsers(String sortBy, String styleSort) {
         List<User> userList = new ArrayList<>();
-        if (!sortBy.equals("id") && !sortBy.equals("name") && !sortBy.equals("email") && !sortBy.equals("country")){
+        if (!sortBy.equals("id") && !sortBy.equals("name") && !sortBy.equals("email") && !sortBy.equals("country")) {
             sortBy = "id";
         }
-        if (!styleSort.equals("asc")&&!styleSort.equals("desc")){
-            styleSort="asc";
+        if (!styleSort.equals("asc") && !styleSort.equals("desc")) {
+            styleSort = "asc";
         }
 
-        String SORT_USERS_VALUES = "select * from users order by "+sortBy+" "+styleSort;
+        String SORT_USERS_VALUES = "select * from users order by " + sortBy + " " + styleSort;
 
         try (
                 Connection connection = getConnection();
@@ -188,12 +188,12 @@ public class UserService implements IUserService {
             System.out.println(prstmts);
             ResultSet rs = prstmts.executeQuery();
 
-            while (rs.next()){
+            while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String email = rs.getString("email");
                 String country = rs.getString("country");
-                userList.add(new User(id,name,email,country));
+                userList.add(new User(id, name, email, country));
             }
         } catch (SQLException throwables) {
             printSQLException(throwables);
@@ -232,13 +232,13 @@ public class UserService implements IUserService {
         }
     }
 
-    private String checkSpaceValue(String value) {
-        if (value == null){
-            return " ";
-        }else
-        if (value.charAt(0) == ' ' || value.charAt(value.length() - 1) == ' ') {
-            value = value.trim(); //xóa khoảng trắng ở đầu và cuối thôi
+    private String clearSpaceValue(String value) {
+        if (value != "") {
+            if (value.charAt(0) == ' ' || value.charAt(value.length() - 1) == ' ') {
+                value = value.trim(); //xóa khoảng trắng ở đầu và cuối thôi
+            }
+            return value;
         }
-        return value;
+        return "";
     }
 }
